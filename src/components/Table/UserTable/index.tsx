@@ -7,7 +7,7 @@ interface UserTableProps {
   users: User[];
   loading: boolean;
   error: string | null;
-  handleMenuClick: (event: React.MouseEvent<HTMLButtonElement>, userName: string) => void;
+  handleMenuClick: (event: React.MouseEvent<HTMLButtonElement>, username: string) => void;
   handleMenuClose: () => void;
   handleEditClick: (user: User) => void;
   handleDeleteClick: (userId: number) => void;
@@ -52,14 +52,14 @@ const UserTable: React.FC<UserTableProps> = ({
                   {users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>{user.name}</TableCell>
-                      <TableCell>{user.userName}</TableCell>
+                      <TableCell>{user.username}</TableCell>
                       <TableCell>{user.status}</TableCell>
                       <TableCell>
                         <IconButton
                           aria-label="more"
                           aria-controls="long-menu"
                           aria-haspopup="true"
-                          onClick={(event) => handleMenuClick(event, user.userName)}
+                          onClick={(event) => handleMenuClick(event, user.username)}
                           id={`menu-button-${user.id}`}
                         >
                           <MoreVertIcon />
@@ -68,7 +68,7 @@ const UserTable: React.FC<UserTableProps> = ({
                           id="long-menu"
                           anchorEl={anchorEl}
                           keepMounted
-                          open={Boolean(anchorEl) && selectedUser === user.userName}
+                          open={Boolean(anchorEl) && selectedUser === user.username}
                           onClose={handleMenuClose}
                         >
                           <MenuItem onClick={() => handleEditClick(user)} id={`edit-button-${user.id}`}>

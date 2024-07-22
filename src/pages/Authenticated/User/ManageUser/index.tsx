@@ -25,7 +25,7 @@ const SaveButton = styled(Button, {
 
 const ManageUser: React.FC = () => {
   const [name, setName] = useState('');
-  const [userName, setUserName] = useState('');
+  const [username, setusername] = useState('');
   const [email, setEmail] = useState('');
   const [permissionGroupId, setPermissionGroupId] = useState<number | string>('');
   const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>([]);
@@ -53,11 +53,11 @@ const ManageUser: React.FC = () => {
     setError(null);
     setSuccessMessage(null);
     try {
-      await createUser(name, userName, email, Number(permissionGroupId));
+      await createUser(name, username, email, Number(permissionGroupId));
       setSuccessMessage('Usuário criado com sucesso!');
       // Limpar o formulário após a criação do usuário
       setName('');
-      setUserName('');
+      setusername('');
       setEmail('');
       setPermissionGroupId('');
     } catch (error) {
@@ -91,8 +91,8 @@ const ManageUser: React.FC = () => {
             id="input-username"
             variant="outlined"
             type="text"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
+            value={username}
+            onChange={(e) => setusername(e.target.value)}
             required
             fullWidth
             margin="normal"

@@ -42,7 +42,7 @@ const Callback = () => {
           if (data && data.token) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('name', data.customerData.name);
-            localStorage.setItem('userName', data.customerData.userName);
+            localStorage.setItem('username', data.customerData.username);
 
             console.log('Token validado e armazenado:', data.token);
          window.location.href =`/dashboard`
@@ -67,13 +67,13 @@ const Callback = () => {
         const decodedToken = decodeToken(token);
         console.log('Decoded token:', decodedToken); // Log para depuração
 
-        if (decodedToken && decodedToken.name && decodedToken.userName) {
-          const { name, userName } = decodedToken;
+        if (decodedToken && decodedToken.name && decodedToken.username) {
+          const { name, username } = decodedToken;
 
           console.log('Token já validado, redirecionando para o dashboard');
           localStorage.setItem('token', token);
           localStorage.setItem('name', name);
-          localStorage.setItem('userName', userName);
+          localStorage.setItem('username', username);
 
           window.location.href =`/dashboard`
 

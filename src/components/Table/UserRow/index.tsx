@@ -5,7 +5,7 @@ import { User } from '../../../types';
 
 interface UserRowProps {
   user: User;
-  handleMenuClick: (event: React.MouseEvent<HTMLButtonElement>, userName: string) => void;
+  handleMenuClick: (event: React.MouseEvent<HTMLButtonElement>, username: string) => void;
   handleMenuClose: () => void;
   handleEditClick: (user: User) => void;
   
@@ -15,14 +15,14 @@ interface UserRowProps {
 
 const UserRow: React.FC<UserRowProps> = ({ user, handleMenuClick, handleMenuClose, handleEditClick, anchorEl, selectedUser }) => {
   return (
-    <TableRow key={user.userName}>
+    <TableRow key={user.username}>
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar sx={{ mr: 1 }}>{user.name.charAt(0)}</Avatar>
           {user.name}
         </Box>
       </TableCell>
-      <TableCell>{user.userName}</TableCell>
+      <TableCell>{user.username}</TableCell>
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{
@@ -37,14 +37,14 @@ const UserRow: React.FC<UserRowProps> = ({ user, handleMenuClick, handleMenuClos
         </Box>
       </TableCell>
       <TableCell>
-        <IconButton onClick={(event) => handleMenuClick(event, user.userName)}  id='menu-tabela'>
+        <IconButton onClick={(event) => handleMenuClick(event, user.username)}  id='menu-tabela'>
         
           <MoreVertIcon />
           
         </IconButton>
         <Menu
           anchorEl={anchorEl}
-          open={Boolean(anchorEl) && selectedUser === user.userName}
+          open={Boolean(anchorEl) && selectedUser === user.username}
           onClose={handleMenuClose}
          
         >

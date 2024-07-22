@@ -13,8 +13,6 @@ import {
 
 
 
-
-
 const api = axios.create({
   baseURL: 'http://10.1.1.151:8000/api',
 });
@@ -46,14 +44,12 @@ api.interceptors.response.use(
 
 
 export const login = async (
-  username: string,
-  password: string,
-  tag:string,
+  userName: string,
+  password: string
 ): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>("/auth/login", {
-    username,
+    userName,
     password,
-    tag
   });
   return response.data;
 };
@@ -62,13 +58,17 @@ export const createUser = async (
   name: string,
   userName: string,
   invitationEmail: string,
-  permissionsGroupsId: number
+  //permissionsGroupsId: number,
+  empresa_id: number,
+  password: string,
 ) => {
-  const response = await api.post('/auth/register', {
+  const response = await api.post('/register', {
     name,
     userName,
     invitationEmail,
-    permissionsGroupsId,
+    //permissionsGroupsId,
+    empresa_id,
+    password,
   });
   return response.data;
 };
@@ -76,11 +76,14 @@ export const createUser = async (
 
 export const getUsers = async (
   name?: string,
-  userName?: string,
+  username?: string,
   status?:string,
+  invitationEmail?:string,
+  companyId?:string,
+
 ): Promise<User[]> => {
   const response = await api.get("/users", {
-    params: { name, userName, status },
+    params: { name, username, status, invitationEmail, companyId },
   });
   return response.data;
 };
@@ -88,17 +91,19 @@ export const getUsers = async (
 export const updateUsers = async (
   id:number,
   name: string,
-  userName: string,
+  username: string,
   status:string,
+  invitationEmail:string,
+  companyId:number,
 ): Promise<User> => {
   const response = await api.put(`/users/${id}`, {
-    name, userName,status
+    name, username, status, companyId, invitationEmail 
   });
   return response.data;
 };
 
 export const getCompany = async (page: number): Promise<{ data: Company[]; total: number; last_page: number }> => {
-  const response = await api.get(`/company?page=${page}`);
+  const response = await api.get(`/companies?page=${page}`);
   return {
     data: response.data.data,
     total: response.data.total,
@@ -106,19 +111,8 @@ export const getCompany = async (page: number): Promise<{ data: Company[]; total
     //sd
   };
 };
-// src/services/auth.ts
-export const deleteUser = async (userId: number) => {
-  try {
-    const response = await api.delete(`/users/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Erro ao deletar usuário', error);
-    throw error;
-  }
-};
-
 export const createCompany = async (name: string, cnpj: string,  clientId:string, clientSecret:string, ssoName:string, tenantId:string): Promise<Company> => {
-  const response = await api.post(`/company`, { name, cnpj, clientId,clientSecret, ssoName, tenantId });
+  const response = await api.post(`/companies`, { name, cnpj, clientId,clientSecret, ssoName, tenantId });
   return response.data;
 };
 
@@ -227,7 +221,7 @@ export const createPermissionGroupHasModule = async (
     post: permissions.post ,
     put: permissions.put ,
     delete: permissions.delete ,
-    modules_id: permissions.modules_id,
+    modules_id: permissions.modulesId,
   });
   return response.data;
 };
@@ -249,7 +243,7 @@ export const updatePermissionGroupHasModule = async (
       post: permissions.post ,
       put: permissions.put ,
       delete: permissions.delete ,
-      modules_id: permissions.modules_id,
+      modules_id: permissions.modulesId,
      
     }
   );
@@ -271,6 +265,10 @@ export const softDeleteApplication = async (id: number): Promise<void> => {
 };
 
 export const updateApplication = async (application: Application): Promise<Application> => {
+  if (!application.id) {
+    throw new Error("Application ID is required for update.");
+  }
+
   const response = await api.put(`/applications/${application.id}`, application);
   return response.data;
 };

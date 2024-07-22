@@ -10,7 +10,7 @@ import DashboardCharts from '../../../components/DashboardCharts';
 interface User {
   id: number;
   name: string;
-  userName: string;
+  username: string;
   empresa_id?: number;
   status: string;
   created_at: string;
@@ -23,14 +23,14 @@ const Dashboard: React.FC = () => {
   const [inactiveUsers, setInactiveUsers] = useState<number>(0);
 
   const [name, setName] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setusername] = useState<string | null>(null);
 
   const [usersRegisteredPerDay, setUsersRegisteredPerDay] = useState<{ name: string, value: number }[]>([]);
   const [usersByStatus, setUsersByStatus] = useState<{ name: string, value: number }[]>([]);
 
   useEffect(() => {
     setName(localStorage.getItem('name'));
-    setUsername(localStorage.getItem('userName'));
+    setusername(localStorage.getItem('username'));
 
     const fetchData = async () => {
       const users = await getUsers();
@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
             usersRegisteredPerDay={usersRegisteredPerDay}
             usersByStatus={usersByStatus}
           />
-          {/* Card com Nome e Username */}
+          {/* Card com Nome e username */}
           <Grid item xs={12}>
             <Paper sx={{ ...paperStyle, justifyContent: 'center' }}>
               <Typography variant="h6" gutterBottom>

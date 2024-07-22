@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
 
 describe('Gerenciamento de Usuários', () => {
-  const userName = `backendFraco`;
-  const userEmail = `${userName}@example.com`;
+  const username = `backendFraco`;
+  const userEmail = `${username}@example.com`;
 
   before(() => {
     const redirectTo = 'http://localhost:5173/callback';
@@ -27,8 +27,8 @@ describe('Gerenciamento de Usuários', () => {
     cy.url().should('include', '/gerenciar-usuario');
     
     // Preenche o formulário de criação de usuário
-    cy.get('#name').type(userName);
-    cy.get('#userName').type(userName);
+    cy.get('#name').type(username);
+    cy.get('#username').type(username);
     cy.get('#email').type(userEmail);
     cy.get('#permissionGroupId').click();
     cy.get('li[data-value="1"]').click();
@@ -58,8 +58,8 @@ describe('Gerenciamento de Usuários', () => {
     cy.url().should('include', '/listar-usuarios');
 
     // Filtra o usuário criado
-    cy.get('#search').type(userName);
-    cy.contains(userName).should('be.visible');
+    cy.get('#search').type(username);
+    cy.contains(username).should('be.visible');
 
     // Abre o menu de ações e clica em "Editar"
     cy.get(`#menu-tabela`).click();
@@ -67,10 +67,10 @@ describe('Gerenciamento de Usuários', () => {
 
     // Edita as informações do usuário
     cy.get('#name').clear();
-    cy.get('#name').type(`${userName} Editado`);
+    cy.get('#name').type(`${username} Editado`);
     
-    cy.get('#userName').clear();
-    cy.get('#userName').type(`editado-${userEmail}`);
+    cy.get('#username').clear();
+    cy.get('#username').type(`editado-${userEmail}`);
 
     // Salva as alterações
     cy.get('#salvar-usuario').contains('Salvar').click();

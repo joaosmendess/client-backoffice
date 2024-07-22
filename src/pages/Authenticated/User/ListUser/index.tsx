@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Toolbar, SelectChangeEvent, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
-import { getUsers, updateUsers, deleteUser } from '../../../../services/auth';
+import { fetchUsers, updateUser, deleteUser } from '../../../../services/userService';
 import { User } from '../../../../types';
 import HeaderTable from '../../../../components/HeaderTable';
 import UserTable from '../../../../components/Table/UserTable';
@@ -23,7 +23,7 @@ const ListUsers: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await getUsers();
+        const data = await fetchUsers();
         setUsers(data);
         setFilteredUsers(data);
       } catch (error) {
@@ -49,14 +49,14 @@ const ListUsers: React.FC = () => {
     setFilteredUsers(
       sortedUsers.filter((user) =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.userName.toLowerCase().includes(searchTerm.toLowerCase())
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
   }, [searchTerm, users, sortBy]);
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, userName: string) => {
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, username: string) => {
     setAnchorEl(event.currentTarget);
-    setSelectedUser(userName);
+    setSelectedUser(username);
   };
 
   const handleMenuClose = () => {
@@ -83,7 +83,7 @@ const ListUsers: React.FC = () => {
   const handleEditSave = async () => {
     if (editUser) {
       try {
-        const updatedUser = await updateUsers(editUser.id, editUser.name, editUser.userName, editUser.status);
+        const updatedUser = await updateUser(editUser.id, editUser.name, editUser.username, editUser.status, editUser);
         setUsers(prevUsers => prevUsers.map(user => user.id === updatedUser.id ? updatedUser : user));
         setSuccessMessage('Usuário atualizado com sucesso!');
       } catch (error) {
@@ -93,7 +93,7 @@ const ListUsers: React.FC = () => {
       }
     }
   };
-
+  
   const handleDeleteClick = (userId: number) => {
     setDeleteUserId(userId);
   };
@@ -160,9 +160,9 @@ const ListUsers: React.FC = () => {
               margin="dense"
               label="Usuário"
               fullWidth
-              value={editUser.userName}
-              id="userName"
-              onChange={e => setEditUser({ ...editUser, userName: e.target.value })}
+              value={editUser.username}
+              id="username"
+              onChange={e => setEditUser({ ...editUser, username: e.target.value })}
             />
             <TextField
               margin="dense"

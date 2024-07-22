@@ -10,6 +10,7 @@ import Header from './components/Header';
 import DrawerMenu from './components/DrawerMenu';
 import RouteGuard from './components/RouterGuard';
 import Callback from './pages/Callback';
+import NotFound from './components/NotFound';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,7 +33,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('name');
-    localStorage.removeItem('userName');
+    localStorage.removeItem('username');
 
     setIsAuthenticated(false);
   };
@@ -50,7 +51,8 @@ const App: React.FC = () => {
         </>
       )}
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/404" />} />
+        <Route path="/login/:tag" element={<Login />} />
         <Route path="/callback" element={<Callback />} />
         <Route
           path="/dashboard"
@@ -76,9 +78,8 @@ const App: React.FC = () => {
             </RouteGuard>
           }
         />
- 
-    
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} />} />
+         <Route path="*" element={<NotFound />} />
+        
       </Routes>
     </Router>
   );

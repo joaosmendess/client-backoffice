@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-
+import { BrowserRouter as Router, Route, Routes, Navigate, } from 'react-router-dom';
 import Dashboard from './pages/Authenticated/Dashboard';
 import Login from './pages/Unauthenticated/Login';
 import ManageUser from './pages/Authenticated/User/ManageUser';
@@ -32,9 +31,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('name');
-    localStorage.removeItem('username');
-
+    localStorage.removeItem('customerData');
     setIsAuthenticated(false);
   };
 
@@ -52,7 +49,7 @@ const App: React.FC = () => {
       )}
       <Routes>
         <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/404" />} />
-        <Route path="/login/:tag" element={<Login />} />
+        <Route path="/login/:tag" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/callback" element={<Callback />} />
         <Route
           path="/dashboard"
@@ -78,8 +75,15 @@ const App: React.FC = () => {
             </RouteGuard>
           }
         />
-         <Route path="*" element={<NotFound />} />
-        
+        <Route
+          path="/gerenciar-usuario/:id"
+          element={
+            <RouteGuard isAuthenticated={isAuthenticated}>
+              <ManageUser />
+            </RouteGuard>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

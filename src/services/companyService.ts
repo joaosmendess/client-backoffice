@@ -91,3 +91,12 @@ export const deleteCompany = async (id: number) => {
   const response = await api.delete(`/companies/${id}`);
   return response.data;
 };
+
+export const getCompanyByTag = async (tag: string) => {
+  const response = await api.get(`/public-company/${tag}`);
+  return response.data;
+};
+export const getCompanyIdByTag = async (tag: string) => {
+  const response = await api.get(`/public-company/${tag}`);
+  return response.data.id;
+};

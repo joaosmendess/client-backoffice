@@ -3,7 +3,8 @@ import { Box, Container, Grid, Paper, Toolbar, Typography, Link } from '@mui/mat
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
-import { getUsers } from '../../../services/auth'; // Altere para o caminho correto
+import { getUsersByCompanyId } from '../../../services/userService';
+import { getCompanyIdByTag } from '../../../services/companyService';
 import { paperStyle, iconBoxStyle, iconBoxBlueStyle, containerStyle, footerStyle, flexGrowStyle } from './styles';
 import DashboardCharts from '../../../components/DashboardCharts';
 
@@ -23,46 +24,61 @@ const Dashboard: React.FC = () => {
   const [inactiveUsers, setInactiveUsers] = useState<number>(0);
 
   const [name, setName] = useState<string | null>(null);
-  const [username, setusername] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   const [usersRegisteredPerDay, setUsersRegisteredPerDay] = useState<{ name: string, value: number }[]>([]);
   const [usersByStatus, setUsersByStatus] = useState<{ name: string, value: number }[]>([]);
 
   useEffect(() => {
-    setName(localStorage.getItem('name'));
-    setusername(localStorage.getItem('username'));
+    const customerData = localStorage.getItem('customerData');
+    let companyTag = null;
+    if (customerData) {
+      const parsedData = JSON.parse(customerData);
+      companyTag = parsedData.tagCompany;
+      setName(parsedData.name);
+      setUsername(parsedData.username);
+    }
 
     const fetchData = async () => {
-      const users = await getUsers();
-      const activeUsersCount = users.filter(user => user.status === 'Ativo').length;
-      const inactiveUsersCount = users.filter(user => user.status === 'Inativo').length;
+      if (companyTag) {
+        try {
+          const companyId = await getCompanyIdByTag(companyTag);
+          const users = await getUsersByCompanyId(companyId);
+          const activeUsersCount = users.filter((user: { status: string; }) => user.status === 'Ativo').length;
+          const inactiveUsersCount = users.filter((user: { status: string; }) => user.status === 'Inativo').length;
 
-      setTotalUsers(users.length);
-      setActiveUsers(activeUsersCount);
-      setInactiveUsers(inactiveUsersCount);
+          setTotalUsers(users.length);
+          setActiveUsers(activeUsersCount);
+          setInactiveUsers(inactiveUsersCount);
 
-      // Processando dados de usuários cadastrados por dia
-      const usersByDay = users.reduce((acc: { [key: string]: number }, user: User) => {
-        const date = new Date(user.created_at);
-        const dayOfWeek = date.toLocaleDateString('pt-BR', { weekday: 'short' });
-        if (!acc[dayOfWeek]) acc[dayOfWeek] = 0;
-        acc[dayOfWeek]++;
-        return acc;
-      }, {});
+          // Processando dados de usuários cadastrados por dia
+          const usersByDay = users.reduce((acc: { [key: string]: number }, user: User) => {
+            const date = new Date(user.created_at);
+            const dayOfWeek = date.toLocaleDateString('pt-BR', { weekday: 'short' });
+            if (!acc[dayOfWeek]) acc[dayOfWeek] = 0;
+            acc[dayOfWeek]++;
+            return acc;
+          }, {});
 
-      const daysOfWeek = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'];
-      const usersRegisteredData = daysOfWeek.map(day => ({
-        name: day,
-        value: usersByDay[day] || 0
-      }));
+          const daysOfWeek = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.'];
+          const usersRegisteredData = daysOfWeek.map(day => ({
+            name: day,
+            value: usersByDay[day] || 0
+          }));
 
-      setUsersRegisteredPerDay(usersRegisteredData);
+          setUsersRegisteredPerDay(usersRegisteredData);
 
-      // Processando dados de usuários por status
-      setUsersByStatus([
-        { name: 'Ativos', value: activeUsersCount },
-        { name: 'Inativos', value: inactiveUsersCount }
-      ]);
+          // Processando dados de usuários por status
+          setUsersByStatus([
+            { name: 'Ativos', value: activeUsersCount },
+            { name: 'Inativos', value: inactiveUsersCount }
+          ]);
+        } catch (error) {
+          console.error('Erro ao buscar dados da empresa ou usuários:', error);
+        }
+      } else {
+        console.error('Tag da empresa não encontrada.');
+      }
     };
 
     fetchData();
@@ -119,10 +135,7 @@ const Dashboard: React.FC = () => {
 
         {/* Gráficos */}
         <Grid container spacing={0}>
-          <DashboardCharts
-            usersRegisteredPerDay={usersRegisteredPerDay}
-            usersByStatus={usersByStatus}
-          />
+          
           {/* Card com Nome e username */}
           <Grid item xs={12}>
             <Paper sx={{ ...paperStyle, justifyContent: 'center' }}>

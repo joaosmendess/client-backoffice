@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Avatar, Typography, Menu, MenuItem, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo-white.png';
-
-
 
 interface HeaderProps {
   pageTitle: string;
@@ -27,8 +24,15 @@ const Header: React.FC<HeaderProps> = ({ pageTitle, toggleDrawer, onLogout }) =>
   };
 
   const handleLogout = () => {
+    const customerData = localStorage.getItem('customerData');
+    let companyTag = 'default-tag'; // default fallback
+    if (customerData) {
+      const parsedData = JSON.parse(customerData);
+      companyTag = parsedData.tagCompany || companyTag;
+    }
+
     onLogout();
-    navigate('/');
+    navigate(`/login/${companyTag}`);
   };
 
   return (
@@ -54,23 +58,21 @@ const Header: React.FC<HeaderProps> = ({ pageTitle, toggleDrawer, onLogout }) =>
             <NotificationsIcon />
           </IconButton>
           <IconButton 
-          color="inherit" 
-          id='menu-profile'
-          onClick={handleMenuOpen}>
+            color="inherit" 
+            id='menu-profile'
+            onClick={handleMenuOpen}
+          >
             <Avatar src="/path-to-avatar.jpg" />
           </IconButton>
           <Menu 
-          anchorEl={anchorEl}
-          id='menu-logout'
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}>
-            <MenuItem
-            onClick={handleLogout}
-              
-            >
-            
+            anchorEl={anchorEl}
+            id='menu-logout'
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleLogout}>
               Sair
-              </MenuItem>
+            </MenuItem>
           </Menu>
         </Box>
       </Toolbar>

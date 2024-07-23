@@ -12,9 +12,7 @@ interface HeaderTableProps {
 const HeaderTable: React.FC<HeaderTableProps> = ({ searchTerm, handleSearchChange, sortBy, handleSortChange }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 2 }}>
-      <Typography variant="h6" component="div" sx={{ mb: { xs: 2, sm: 0 } }}>
-        Todos os usuários
-      </Typography>
+      
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, width: '100%', maxWidth: { xs: '100%', sm: '30%' } }}>
         <TextField
           variant="outlined"

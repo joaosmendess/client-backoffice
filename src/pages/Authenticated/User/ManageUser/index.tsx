@@ -1,68 +1,127 @@
 import React, { useState, useEffect } from 'react';
-import { styled } from '../../../../stitches.config';
-import { TextField, Button, Box, Select, MenuItem, InputLabel, FormControl, CircularProgress, Toolbar } from '@mui/material';
-import { getPermissionGroups, createUser } from '../../../../services/auth';
-import { PermissionGroup } from '../../../../types';
+import { useParams } from 'react-router-dom';
+import { TextField, Box, CircularProgress, Toolbar, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { getUserById, updateUser } from '../../../../services/userService';
+import { register } from '../../../../services/registerService';
 import Success from '../../../../components/Messages/SuccessMessage';
 import Error from '../../../../components/Messages/ErrorMessage';
-
-const FormContainer = styled(Box, {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '2rem',
-  borderRadius: '8px',
-  maxWidth: '400px',
-  margin: '0 auto',
-});
-
-const SaveButton = styled(Button, {
-  marginTop: '1rem',
-  backgroundColor: '#6a0dad'
-
-});
+import FormContainer from '../../../../components/FormContainer';
+import FormButton from '../../../../components/FormButton';
 
 const ManageUser: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [name, setName] = useState('');
-  const [username, setusername] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [permissionGroupId, setPermissionGroupId] = useState<number | string>('');
-  const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>([]);
+  const [status, setStatus] = useState(''); // Valor inicial do status
+  const [companyId, setCompanyId] = useState<number | null>(null); // Inicializado como null
+  const [tagCompany, setTagCompany] = useState<string>(''); // Inicializado como string vazia
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getPermissionGroups();
-        setPermissionGroups(data);
-      } catch (error) {
-        console.error('Erro ao buscar grupos de permissões', error);
-        setError('Erro ao buscar grupos de permissões');
-      }
-    };
-    fetchData();
-  }, []);
- 
+    // Obter o companyId e tagCompany do localStorage
+    const loggedUser = JSON.parse(localStorage.getItem('customerData') || '{}');
+    setCompanyId(loggedUser.companyId);
+    setTagCompany(loggedUser.tagCompany);
+
+    if (id) {
+      const fetchUser = async () => {
+        try {
+          const user = await getUserById(parseInt(id));
+          console.log('Fetched user:', user);
+          
+          setName(user.name);
+          setUsername(user.username);
+          setEmail(user.invitationEmail);
+          setStatus(user.status);
+          setCompanyId(user.companyId); // Isso pode ser necessário se você permitir que um usuário edite seu próprio perfil
+          setTagCompany(user.tagCompany); // Isso pode ser necessário se você permitir que um usuário edite seu próprio perfil
+        } catch (error) {
+          console.error('Erro ao buscar usuário', error);
+          setError('Erro ao buscar usuário');
+        }
+      };
+      fetchUser();
+    }
+  }, [id]);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
+
+    let hasError = false;
+
+    if (!name) {
+      setNameError('Nome é obrigatório');
+      hasError = true;
+    } else {
+      setNameError(null);
+    }
+
+    if (!username) {
+      setUsernameError('Usuário é obrigatório');
+      hasError = true;
+    } else {
+      setUsernameError(null);
+    }
+
+    if (!email) {
+      setEmailError('Email é obrigatório');
+      hasError = true;
+    } else {
+      setEmailError(null);
+    }
+
+    if (hasError) {
+      setLoading(false);
+      return;
+    }
+
+    if (!companyId) {
+      setError('ID da empresa não encontrado.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      await createUser(name, username, email, Number(permissionGroupId));
-      setSuccessMessage('Usuário criado com sucesso!');
-      // Limpar o formulário após a criação do usuário
-      setName('');
-      setusername('');
-      setEmail('');
-      setPermissionGroupId('');
+      if (id) {
+        await updateUser({
+          id: parseInt(id),
+          name,
+          username: username,
+          invitationEmail: email,
+          companyId: companyId,
+          status,
+          tagCompany: tagCompany, // Adiciona tagCompany ao atualizar
+        });
+        setSuccessMessage('Dados de usuário atualizados com sucesso!');
+      } else {
+        await register({
+          name,
+          username,
+          invitationEmail: email,
+          companyId,
+          status,
+          password: '0fm53nh4@2024'
+        });
+        setSuccessMessage('E-mail de confirmação enviado com sucesso!');
+        setName('');
+        setUsername('');
+        setEmail('');
+        setStatus('Ativo');
+      }
     } catch (error) {
-      console.error('Erro ao criar usuário', error);
-      setError('Erro ao criar usuário');
+      console.error('Erro ao salvar usuário', error);
+      setError('Erro ao salvar usuário');
     } finally {
       setLoading(false);
     }
@@ -70,7 +129,7 @@ const ManageUser: React.FC = () => {
 
   return (
     <>
-      <Toolbar /> 
+      <Toolbar />
       <FormContainer>
         {error && <Error message={error} />}
         {successMessage && <Success message={successMessage} />}
@@ -85,6 +144,8 @@ const ManageUser: React.FC = () => {
             required
             fullWidth
             margin="normal"
+            error={!!nameError}
+            helperText={nameError}
           />
           <TextField
             label="Usuário"
@@ -92,10 +153,12 @@ const ManageUser: React.FC = () => {
             variant="outlined"
             type="text"
             value={username}
-            onChange={(e) => setusername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             required
             fullWidth
             margin="normal"
+            error={!!usernameError}
+            helperText={usernameError}
           />
           <TextField
             label="Email"
@@ -107,30 +170,34 @@ const ManageUser: React.FC = () => {
             required
             fullWidth
             margin="normal"
+            error={!!emailError}
+            helperText={emailError}
           />
-         <FormControl fullWidth margin="normal">
-            <InputLabel>Grupo de permissão</InputLabel>
+          <FormControl variant="outlined" fullWidth margin="normal">
+            <InputLabel id="select-status-label">Status</InputLabel>
             <Select
-              value={permissionGroupId}
-              id="select-permission-group"
-              onChange={(e) => setPermissionGroupId(e.target.value as string)}
-              required
-              label="Grupo de permissão"
+              labelId="select-status-label"
+              id="select-status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              label="Status"
             >
-              <MenuItem value=""><em>None</em></MenuItem>
-              {permissionGroups.map((group) => (
-                <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
-              ))}
+              <MenuItem value="Ativo">Ativo</MenuItem>
+              <MenuItem value="Bloqueado">Bloqueado</MenuItem>
+              <MenuItem value="Inativo">Inativo</MenuItem>
             </Select>
           </FormControl>
-          <SaveButton 
-          type="submit"
-          id='button-manage-user'
-          variant="contained"
-          color="primary"
-          fullWidth disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Salvar'}
-          </SaveButton>
+          <Box display="flex" justifyContent="center" width="100%">
+            <FormButton
+              type="submit"
+              id="button-manage-user"
+              loading={loading}
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : id ? 'Editar' : 'Salvar'}
+            </FormButton>
+          </Box>
         </form>
       </FormContainer>
     </>

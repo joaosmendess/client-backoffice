@@ -1,29 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Toolbar, SelectChangeEvent, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
-import { fetchUsers, updateUser, deleteUser } from '../../../../services/userService';
+import {
+  Box,
+  Toolbar,
+  CircularProgress,
+  SelectChangeEvent,
+  Typography
+} from '@mui/material';
+import { getUsersByCompanyId, deleteUser } from '../../../../services/userService';
+import { getCompanyByTag } from '../../../../services/companyService';
 import { User } from '../../../../types';
 import HeaderTable from '../../../../components/HeaderTable';
-import UserTable from '../../../../components/Table/UserTable';
 import Success from '../../../../components/Messages/SuccessMessage';
+import { useNavigate } from 'react-router-dom';
+import ListItemWithMenu from '../../../../components/ListItemWithMenu';
 
 const ListUsers: React.FC = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedUser, setSelectedUser] = useState<null | string>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('newest');
-  const [editUser, setEditUser] = useState<null | User>(null);
-  const [deleteUserId, setDeleteUserId] = useState<null | number>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await fetchUsers();
+        // Obter os detalhes do usuário logado do localStorage
+        const loggedUser = JSON.parse(localStorage.getItem('customerData') || '{}');
+        const tagCompany = loggedUser.tagCompany; // Certifique-se de que `tagCompany` é extraído corretamente
+
+        if (!tagCompany) {
+          setError('Erro ao buscar empresa. Tag da empresa não encontrado.');
+          setLoading(false);
+          return;
+        }
+
+        // Buscar companyId pela tagCompany
+        const companyData = await getCompanyByTag(tagCompany);
+        const companyId = companyData.id;
+
+        if (!companyId) {
+          setError('Erro ao buscar empresa. ID da empresa não encontrado.');
+          setLoading(false);
+          return;
+        }
+
+        // Buscar usuários pela empresa
+        const data = await getUsersByCompanyId(companyId);
+
         setUsers(data);
         setFilteredUsers(data);
       } catch (error) {
@@ -39,9 +66,9 @@ const ListUsers: React.FC = () => {
   useEffect(() => {
     let sortedUsers = [...users];
     if (sortBy === 'newest') {
-      sortedUsers = sortedUsers.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      sortedUsers = sortedUsers.sort((a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime());
     } else if (sortBy === 'oldest') {
-      sortedUsers = sortedUsers.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      sortedUsers = sortedUsers.sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime());
     } else if (sortBy === 'name') {
       sortedUsers = sortedUsers.sort((a, b) => a.name.localeCompare(b.name));
     }
@@ -54,16 +81,6 @@ const ListUsers: React.FC = () => {
     );
   }, [searchTerm, users, sortBy]);
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, username: string) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedUser(username);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedUser(null);
-  };
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
@@ -73,48 +90,30 @@ const ListUsers: React.FC = () => {
   };
 
   const handleEditClick = (user: User) => {
-    setEditUser(user);
+    navigate(`/gerenciar-usuario/${user.id}`);
   };
 
-  const handleEditClose = () => {
-    setEditUser(null);
-  };
-
-  const handleEditSave = async () => {
-    if (editUser) {
-      try {
-        const updatedUser = await updateUser(editUser.id, editUser.name, editUser.username, editUser.status, editUser);
-        setUsers(prevUsers => prevUsers.map(user => user.id === updatedUser.id ? updatedUser : user));
-        setSuccessMessage('Usuário atualizado com sucesso!');
-      } catch (error) {
-        console.error('Erro ao atualizar usuário', error);
-      } finally {
-        setEditUser(null);
-      }
+  const handleDeleteUser = async (user: User) => {
+    setLoading(true);
+    try {
+      await deleteUser(user.id);
+      setUsers(users.filter(u => u.id !== user.id));
+      setSuccessMessage('Usuário excluído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir usuário', error);
+      setError('Erro ao excluir usuário');
+    } finally {
+      setLoading(false);
     }
   };
-  
-  const handleDeleteClick = (userId: number) => {
-    setDeleteUserId(userId);
-  };
 
-  const handleDeleteClose = () => {
-    setDeleteUserId(null);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (deleteUserId) {
-      try {
-        await deleteUser(deleteUserId);
-        setUsers(prevUsers => prevUsers.filter(user => user.id !== deleteUserId));
-        setSuccessMessage('Usuário deletado com sucesso!');
-      } catch (error) {
-        console.error('Erro ao deletar usuário', error);
-      } finally {
-        setDeleteUserId(null);
-      }
-    }
-  };
+  const renderUserDetails = (user: User) => (
+    <Box>
+      <Typography variant="h6">{user.name}</Typography>
+      <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.username}</Typography>
+      <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.invitationEmail}</Typography>
+    </Box>
+  );
 
   return (
     <>
@@ -127,73 +126,20 @@ const ListUsers: React.FC = () => {
           sortBy={sortBy}
           handleSortChange={handleSortChange}
         />
-        <UserTable
-          users={filteredUsers}
-          loading={loading}
-          error={error}
-          handleMenuClick={handleMenuClick}
-          handleMenuClose={handleMenuClose}
-          anchorEl={anchorEl}
-          selectedUser={selectedUser}
-          handleEditClick={handleEditClick}
-          handleDeleteClick={handleDeleteClick}
-        />
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          filteredUsers.map((user) => (
+            <ListItemWithMenu
+              key={user.id}
+              item={user}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteUser}
+              renderItemDetails={renderUserDetails}
+            />
+          ))
+        )}
       </Box>
-
-      {editUser && (
-        <Dialog open={Boolean(editUser)} onClose={handleEditClose}>
-          <DialogTitle>Editar Usuário</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Faça as alterações necessárias nos campos abaixo.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Nome"
-              fullWidth
-              value={editUser.name}
-              id="name"
-              onChange={e => setEditUser({ ...editUser, name: e.target.value })}
-            />
-            <TextField
-              margin="dense"
-              label="Usuário"
-              fullWidth
-              value={editUser.username}
-              id="username"
-              onChange={e => setEditUser({ ...editUser, username: e.target.value })}
-            />
-            <TextField
-              margin="dense"
-              label="Status"
-              fullWidth
-              value={editUser.status}
-              id="status"
-              onChange={e => setEditUser({ ...editUser, status: e.target.value })}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleEditClose} id="fechar-modal">Cancelar</Button>
-            <Button onClick={handleEditSave} id="salvar-usuario">Salvar</Button>
-          </DialogActions>
-        </Dialog>
-      )}
-
-      {deleteUserId && (
-        <Dialog open={Boolean(deleteUserId)} onClose={handleDeleteClose}>
-          <DialogTitle>Deletar Usuário</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Tem certeza que deseja deletar este usuário? Esta ação não pode ser desfeita.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteClose} id="fechar-modal-delete">Cancelar</Button>
-            <Button onClick={handleDeleteConfirm} id="confirmar-delete">Deletar</Button>
-          </DialogActions>
-        </Dialog>
-      )}
     </>
   );
 };

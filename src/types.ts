@@ -111,6 +111,12 @@ export interface PermissionGroup {
   updated_at: string;
 }
 
+// Invite users
+export interface Invite {
+  invitationEmail: string;
+  companyId: number;
+}
+
 export interface PermissionGroupHasModule {
   name: string;
   id: number;

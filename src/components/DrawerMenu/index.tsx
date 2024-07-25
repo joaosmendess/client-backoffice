@@ -5,6 +5,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import MailOutlineIcon from '@mui/icons-material/MailOutline'; // Ícone de convite
 
 const DrawerMenu: React.FC<{ open: boolean; onClose: () => void; setPageTitle: (title: string) => void }> = ({ open, onClose, setPageTitle }) => {
   const navigate = useNavigate();
@@ -14,10 +15,10 @@ const DrawerMenu: React.FC<{ open: boolean; onClose: () => void; setPageTitle: (
     setUserMenuOpen(!userMenuOpen);
   };
 
-
   const handleNavigation = (path: string, title: string) => {
     navigate(path);
     setPageTitle(title);
+    localStorage.setItem('pageTitle', title); // Salva o título no localStorage
     onClose();
   };
 
@@ -49,7 +50,12 @@ const DrawerMenu: React.FC<{ open: boolean; onClose: () => void; setPageTitle: (
           </List>
         </Collapse>
 
-        
+        <ListItemButton id="menu-invite" onClick={() => handleNavigation('/convidar-usuario', 'Convite de usuario')}>
+          <ListItemIcon>
+            <MailOutlineIcon />
+          </ListItemIcon>
+          <ListItemText primary="Convidar usuário" />
+        </ListItemButton>
       </List>
     </Drawer>
   );

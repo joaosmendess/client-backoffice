@@ -3,8 +3,7 @@ import {
   Box,
   Toolbar,
   CircularProgress,
-  SelectChangeEvent,
-  Typography
+  Typography,
 } from '@mui/material';
 import { getUsersByCompanyId, deleteUser } from '../../../../services/userService';
 import { getCompanyByTag } from '../../../../services/companyService';
@@ -12,14 +11,14 @@ import { User } from '../../../../types';
 import HeaderTable from '../../../../components/HeaderTable';
 import Success from '../../../../components/Messages/SuccessMessage';
 import { useNavigate } from 'react-router-dom';
-import ListItemWithMenu from '../../../../components/ListItemWithMenu';
+import GenericTable from '../../../../components/GenericTable';
 
 const ListUsers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
-  const [, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState('newest');
   const navigate = useNavigate();
@@ -28,9 +27,8 @@ const ListUsers: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Obter os detalhes do usuário logado do localStorage
         const loggedUser = JSON.parse(localStorage.getItem('customerData') || '{}');
-        const tagCompany = loggedUser.tagCompany; // Certifique-se de que `tagCompany` é extraído corretamente
+        const tagCompany = loggedUser.tagCompany;
 
         if (!tagCompany) {
           setError('Erro ao buscar empresa. Tag da empresa não encontrado.');
@@ -38,7 +36,6 @@ const ListUsers: React.FC = () => {
           return;
         }
 
-        // Buscar companyId pela tagCompany
         const companyData = await getCompanyByTag(tagCompany);
         const companyId = companyData.id;
 
@@ -48,7 +45,6 @@ const ListUsers: React.FC = () => {
           return;
         }
 
-        // Buscar usuários pela empresa
         const data = await getUsersByCompanyId(companyId);
 
         setUsers(data);
@@ -85,8 +81,8 @@ const ListUsers: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSortChange = (event: SelectChangeEvent<string>) => {
-    setSortBy(event.target.value);
+  const handleSortChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSortBy(event.target.value as string);
   };
 
   const handleEditClick = (user: User) => {
@@ -107,14 +103,6 @@ const ListUsers: React.FC = () => {
     }
   };
 
-  const renderUserDetails = (user: User) => (
-    <Box>
-      <Typography variant="h6">{user.name}</Typography>
-      <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.username}</Typography>
-      <Typography variant="body2" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.invitationEmail}</Typography>
-    </Box>
-  );
-
   return (
     <>
       <Toolbar />
@@ -123,22 +111,17 @@ const ListUsers: React.FC = () => {
         <HeaderTable
           searchTerm={searchTerm}
           handleSearchChange={handleSearchChange}
-          sortBy={sortBy}
+          sortOption={sortBy}
           handleSortChange={handleSortChange}
         />
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          filteredUsers.map((user) => (
-            <ListItemWithMenu
-              key={user.id}
-              item={user}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteUser}
-              renderItemDetails={renderUserDetails}
-            />
-          ))
-        )}
+        <GenericTable
+          columns={['name', 'username', 'invitationEmail']}
+          data={filteredUsers}
+          loading={loading}
+          error={error}
+          handleEdit={handleEditClick}
+          handleDelete={handleDeleteUser}
+        />
       </Box>
     </>
   );

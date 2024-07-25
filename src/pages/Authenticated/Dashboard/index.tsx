@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Container, Grid, Paper, Toolbar, Typography, Link } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-
 import { getUsersByCompanyId } from '../../../services/userService';
 import { getCompanyIdByTag } from '../../../services/companyService';
 import { paperStyle, iconBoxStyle, iconBoxBlueStyle, containerStyle, footerStyle, flexGrowStyle } from './styles';
@@ -22,10 +21,8 @@ const Dashboard: React.FC = () => {
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [activeUsers, setActiveUsers] = useState<number>(0);
   const [inactiveUsers, setInactiveUsers] = useState<number>(0);
-
   const [name, setName] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-
   const [usersRegisteredPerDay, setUsersRegisteredPerDay] = useState<{ name: string, value: number }[]>([]);
   const [usersByStatus, setUsersByStatus] = useState<{ name: string, value: number }[]>([]);
 
@@ -84,12 +81,34 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-
   return (
     <>
       {/* Adiciona espaço para o AppBar */}
       <Toolbar />
-      <h2>Client Backoffice</h2>
+      <Box
+        sx={{
+          backgroundColor: 'none',
+          color: 'linear-gradient(to right, #202020, #3E3D45)',
+          padding: 2,
+          
+          textAlign: 'center',
+          marginBottom: 2,
+         
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{
+            fontFamily: 'Roboto, sans-serif',
+            fontWeight: 'bold',
+            letterSpacing: 1.5,
+            textShadow: ' rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          OFM Backoffice Cliente
+        </Typography>
+      </Box>
       <Container maxWidth="lg" sx={containerStyle}>
         <Grid container spacing={5}>
           {/* Card de Usuários Totais */}
@@ -135,7 +154,6 @@ const Dashboard: React.FC = () => {
 
         {/* Gráficos */}
         <Grid container spacing={0}>
-          
           {/* Card com Nome e username */}
           <Grid item xs={12}>
             <Paper sx={{ ...paperStyle, justifyContent: 'center' }}>

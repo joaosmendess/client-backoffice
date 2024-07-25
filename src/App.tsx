@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Authenticated/Dashboard';
 import Login from './pages/Unauthenticated/Login';
 import ManageUser from './pages/Authenticated/User/ManageUser';
@@ -10,11 +10,12 @@ import DrawerMenu from './components/DrawerMenu';
 import RouteGuard from './components/RouterGuard';
 import Callback from './pages/Callback';
 import NotFound from './components/NotFound';
+import Invitation from './pages/Authenticated/Invitation';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [pageTitle, setPageTitle] = useState('Início');
+  const [pageTitle, setPageTitle] = useState(localStorage.getItem('pageTitle') || ''); // Recupera o título do localStorage
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -30,9 +31,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('customerData');
-    setIsAuthenticated(false);
+    localStorage.clear();
   };
 
   if (isLoading) {
@@ -80,6 +79,14 @@ const App: React.FC = () => {
           element={
             <RouteGuard isAuthenticated={isAuthenticated}>
               <ManageUser />
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/convidar-usuario"
+          element={
+            <RouteGuard isAuthenticated={isAuthenticated}>
+              <Invitation />
             </RouteGuard>
           }
         />

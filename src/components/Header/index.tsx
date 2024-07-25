@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Avatar, Typography, Menu, MenuItem, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo-white.png';
+import logo from '../../assets/rating.png';
 
 interface HeaderProps {
   pageTitle: string;
@@ -13,8 +12,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ pageTitle, toggleDrawer, onLogout }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const navigate = useNavigate();
-
+  
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -30,9 +28,9 @@ const Header: React.FC<HeaderProps> = ({ pageTitle, toggleDrawer, onLogout }) =>
       const parsedData = JSON.parse(customerData);
       companyTag = parsedData.tagCompany || companyTag;
     }
-
+localStorage.clear()
     onLogout();
-    navigate(`/login/${companyTag}`);
+    window.location.href = `/login/${companyTag}`;
   };
 
   return (

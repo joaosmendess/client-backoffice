@@ -3,7 +3,7 @@ import { Box, Container, Grid, Paper, Toolbar, Typography, Link } from '@mui/mat
 import PersonIcon from '@mui/icons-material/Person';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { getUsersByCompanyId } from '../../../services/userService';
-import { getCompanyIdByTag } from '../../../services/companyService';
+import { getCompanyIdByHash } from '../../../services/companyService';
 import { paperStyle, iconBoxStyle, iconBoxBlueStyle, containerStyle, footerStyle, flexGrowStyle } from './styles';
 import DashboardCharts from '../../../components/DashboardCharts';
 
@@ -11,7 +11,7 @@ interface User {
   id: number;
   name: string;
   username: string;
-  empresa_id?: number;
+  companyId?: number;
   status: string;
   created_at: string;
   updated_at: string;
@@ -28,18 +28,18 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const customerData = localStorage.getItem('customerData');
-    let companyTag = null;
+    let hashCompany = null;
     if (customerData) {
       const parsedData = JSON.parse(customerData);
-      companyTag = parsedData.tagCompany;
+      hashCompany = parsedData.hashCompany; // Atualizado para usar hashCompany
       setName(parsedData.name);
       setUsername(parsedData.username);
     }
 
     const fetchData = async () => {
-      if (companyTag) {
+      if (hashCompany) {
         try {
-          const companyId = await getCompanyIdByTag(companyTag);
+          const companyId = await getCompanyIdByHash(hashCompany);
           const users = await getUsersByCompanyId(companyId);
           const activeUsersCount = users.filter((user: { status: string; }) => user.status === 'Ativo').length;
           const inactiveUsersCount = users.filter((user: { status: string; }) => user.status === 'Inativo').length;
@@ -74,7 +74,7 @@ const Dashboard: React.FC = () => {
           console.error('Erro ao buscar dados da empresa ou usuários:', error);
         }
       } else {
-        console.error('Tag da empresa não encontrada.');
+        console.error('Hash da empresa não encontrado.');
       }
     };
 
@@ -90,10 +90,8 @@ const Dashboard: React.FC = () => {
           backgroundColor: 'none',
           color: 'linear-gradient(to right, #202020, #3E3D45)',
           padding: 2,
-          
           textAlign: 'center',
           marginBottom: 2,
-         
         }}
       >
         <Typography

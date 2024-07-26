@@ -22,7 +22,7 @@ import {
 } from './styles';
 
 const Login: React.FC = () => {
-  const { tag } = useParams<{ tag: string }>(); // Obtendo a tag da URL
+  const { hash } = useParams<{ hash: string }>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -39,11 +39,19 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await login(username, password, tag!); // Passando a tag extraída da URL
+      const response = await login(username, password, hash!);
       if (response && response.token) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('customerData', JSON.stringify(response.customerData));
-        window.location.href = '/dashboard';
+        const hasAdminPermission = response.customerData.permissions.some(
+          (perm: any) => perm.modules.some((mod: any) => mod.name === 'Administrador')
+        );
+
+        if (hasAdminPermission) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('customerData', JSON.stringify(response.customerData));
+          window.location.href = '/dashboard';
+        } else {
+          setError('Você não tem permissão para acessar este sistema.');
+        }
       } else {
         setError('Falha no login. Verifique suas credenciais.');
       }

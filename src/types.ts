@@ -9,7 +9,7 @@ export interface UserCustomerData {
   username: string;
   company: string;
   companyId: number;
-  tagCompany:string;
+  hashCompany:string;
   permissions: UserPermission[];
 }
 
@@ -38,16 +38,13 @@ export interface ModulePermission {
 export interface User {
   id: number;
   name: string;
-  username:string;
-  tagCompany:string;
+  username: string;
   status: string;
-  
   invitationEmail: string;
   password?: string;
   companyId: number;
-
-created_at?: string 
-
+  permissionGroupId?: string;
+  created_at?: string;
 }
 
 export interface UserInfo {

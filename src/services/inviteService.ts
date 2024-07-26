@@ -7,3 +7,5 @@ export const inviteUser = async (invitationEmail:string, companyId:number): Prom
     const response = await api.post('/auth/invite', {invitationEmail, companyId});
     return response.data; 
 }
+
+//companyId pode pegar do local storage

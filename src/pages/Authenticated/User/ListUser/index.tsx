@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Toolbar,
-  CircularProgress,
-  Typography,
 } from '@mui/material';
 import { getUsersByCompanyId, deleteUser } from '../../../../services/userService';
-import { getCompanyByTag } from '../../../../services/companyService';
+import { getCompanyByHash } from '../../../../services/companyService';
 import { User } from '../../../../types';
 import HeaderTable from '../../../../components/HeaderTable';
 import Success from '../../../../components/Messages/SuccessMessage';
@@ -28,7 +26,7 @@ const ListUsers: React.FC = () => {
       setLoading(true);
       try {
         const loggedUser = JSON.parse(localStorage.getItem('customerData') || '{}');
-        const tagCompany = loggedUser.tagCompany;
+        const tagCompany = loggedUser.hashCompany;
 
         if (!tagCompany) {
           setError('Erro ao buscar empresa. Tag da empresa não encontrado.');
@@ -36,7 +34,7 @@ const ListUsers: React.FC = () => {
           return;
         }
 
-        const companyData = await getCompanyByTag(tagCompany);
+        const companyData = await getCompanyByHash(tagCompany);
         const companyId = companyData.id;
 
         if (!companyId) {

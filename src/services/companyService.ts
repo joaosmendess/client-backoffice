@@ -3,11 +3,11 @@ import { Company } from '../types';
 
 /**
  * Obtém os dados da empresa pública.
- * @param {string} tag - Tag da empresa.
+ * @param {string} hash - Hash da empresa.
  * @returns {Promise<any>} - Dados da empresa.
  */
-export const getPublicCompany = async (tag: string) => {
-  const response = await api.get(`/public-company/${tag}`);
+export const getPublicCompany = async (hash: string) => {
+  const response = await api.get(`/public-company/${hash}`);
   return response.data;
 };
 
@@ -36,7 +36,7 @@ export const getCompanyById = async (id: number): Promise<Company> => {
 /**
  * Cria uma nova empresa.
  * @param {string} name - Nome da empresa.
- * @param {string} tag - Tag da empresa.
+ * @param {string} hash - Hash da empresa.
  * @param {string} cnpj - CNPJ da empresa.
  * @param {string} ssoName - Nome do SSO (opcional).
  * @param {string} clientId - ID do cliente (opcional).
@@ -47,7 +47,7 @@ export const getCompanyById = async (id: number): Promise<Company> => {
  */
 export const createCompany = async (
   name: string,
-  tag: string,
+  hash: string,
   cnpj: string,
   ssoName?: string,
   clientId?: string,
@@ -57,7 +57,7 @@ export const createCompany = async (
 ): Promise<Company> => {
   const response = await api.post('/companies', {
     name,
-    tag,
+    hash,
     cnpj,
     ssoName,
     clientId,
@@ -92,11 +92,11 @@ export const deleteCompany = async (id: number) => {
   return response.data;
 };
 
-export const getCompanyByTag = async (tag: string) => {
-  const response = await api.get(`/public-company/${tag}`);
+export const getCompanyByHash = async (hash: string) => {
+  const response = await api.get(`/public-company/${hash}`);
   return response.data;
 };
-export const getCompanyIdByTag = async (tag: string) => {
-  const response = await api.get(`/public-company/${tag}`);
+export const getCompanyIdByHash = async (hash: string) => {
+  const response = await api.get(`/public-company/${hash}`);
   return response.data.id;
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Toolbar, Box } from '@mui/material';
-import { getCompanyIdByTag } from '../../../services/companyService';
+import { getCompanyIdByHash } from '../../../services/companyService';
 import { inviteUser } from '../../../services/inviteService';
 import FormContainer from '../../../components/FormContainer';
 import FormButton from '../../../components/FormButton';
@@ -18,14 +18,14 @@ const Invitation: React.FC = () => {
     const fetchCompanyId = async () => {
       try {
         const customerData = JSON.parse(localStorage.getItem('customerData') || '{}');
-        const tagCompany: string = customerData.tagCompany;
+        const tagCompany: string = customerData.hashCompany;
 
         if (!tagCompany) {
           setError('Erro ao buscar empresa. Tag da empresa não encontrada.');
           return;
         }
 
-        const companyId = await getCompanyIdByTag(tagCompany);
+        const companyId = await getCompanyIdByHash(tagCompany);
         setCompanyId(companyId);
       } catch (error) {
         setError('Erro ao buscar empresa');

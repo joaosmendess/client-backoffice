@@ -48,7 +48,7 @@ const App: React.FC = () => {
       )}
       <Routes>
         <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/404" />} />
-        <Route path="/login/:tag" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
+        <Route path="/login/:hash" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/callback" element={<Callback />} />
         <Route
           path="/dashboard"

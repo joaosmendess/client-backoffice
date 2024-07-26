@@ -23,14 +23,14 @@ const Header: React.FC<HeaderProps> = ({ pageTitle, toggleDrawer, onLogout }) =>
 
   const handleLogout = () => {
     const customerData = localStorage.getItem('customerData');
-    let companyTag = 'default-tag'; // default fallback
+    let hashCompany = 'default-hash'; // default fallback
     if (customerData) {
       const parsedData = JSON.parse(customerData);
-      companyTag = parsedData.tagCompany || companyTag;
+      hashCompany = parsedData.hashCompany || hashCompany;
     }
-localStorage.clear()
+    localStorage.clear();
     onLogout();
-    window.location.href = `/login/${companyTag}`;
+    window.location.href = `/login/${hashCompany}`;
   };
 
   return (

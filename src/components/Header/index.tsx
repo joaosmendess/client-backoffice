@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ pageTitle, toggleDrawer, onLogout }) =>
     >
       <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer}>
+          <IconButton id='menu-main' edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer}>
             <MenuIcon />
           </IconButton>
           <img src={logo} alt="SSO" style={{ height: 40 }} />

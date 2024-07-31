@@ -32,7 +32,7 @@ const DrawerMenu: React.FC<{ open: boolean; onClose: () => void; setPageTitle: (
           <ListItemText primary="Início" />
         </ListItemButton>
         
-        <ListItemButton id="user-menu" onClick={handleUserMenuClick}>
+        <ListItemButton id="menu-user" onClick={handleUserMenuClick}>
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
@@ -41,10 +41,10 @@ const DrawerMenu: React.FC<{ open: boolean; onClose: () => void; setPageTitle: (
         </ListItemButton>
         <Collapse in={userMenuOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <ListItemButton id="manage-user-menu" onClick={() => handleNavigation('/gerenciar-usuario', 'Gerenciar Usuário')} style={{ paddingLeft: 32 }}>
+            <ListItemButton id="-menu-manage-user" onClick={() => handleNavigation('/gerenciar-usuario', 'Gerenciar Usuário')} style={{ paddingLeft: 32 }}>
               <ListItemText primary="Gerenciar usuário" />
             </ListItemButton>
-            <ListItemButton id="list-user-menu" onClick={() => handleNavigation('/listar-usuarios', 'Listar usuários')} style={{ paddingLeft: 32 }}>
+            <ListItemButton id="menu-list-users" onClick={() => handleNavigation('/listar-usuarios', 'Listar usuários')} style={{ paddingLeft: 32 }}>
               <ListItemText primary="Listar usuários" />
             </ListItemButton>
           </List>

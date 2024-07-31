@@ -14,6 +14,7 @@ const HeaderTable: React.FC<HeaderTableProps> = ({ searchTerm, handleSearchChang
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: 2, padding: 2, }}>
       <TextField
         variant="outlined"
+         id='input-search'
         placeholder="Procurar"
         sx={{ width: '100%', maxWidth: '400px' }}
         value={searchTerm}

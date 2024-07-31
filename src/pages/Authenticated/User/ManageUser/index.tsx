@@ -229,9 +229,9 @@ const ManageUser: React.FC = () => {
               onChange={(e) => setStatus(e.target.value)}
               label="Status"
             >
-              <MenuItem value="Ativo">Ativo</MenuItem>
-              <MenuItem value="Bloqueado">Bloqueado</MenuItem>
-              <MenuItem value="Inativo">Inativo</MenuItem>
+              <MenuItem  id='menu-active' value="Ativo">Ativo</MenuItem>
+              <MenuItem  id='menu-block' value="Bloqueado">Bloqueado</MenuItem>
+              <MenuItem  id='menu-inactive' value="Inativo">Inativo</MenuItem>
             </Select>
           </FormControl>
           <FormControl variant="outlined" fullWidth margin="normal">

@@ -120,17 +120,18 @@ const GenericTable = <T extends TableData>({ columns, data, loading, error, hand
                         </TableCell>
                       ))}
                       <TableCell>
-                        <IconButton onClick={(event) => handleMenuClick(event, item)}>
+                      <IconButton  id='menu' onClick={(event) => handleMenuClick(event, item)}>
                           <MoreVertIcon />
                         </IconButton>
                         <Menu
                           anchorEl={anchorEl}
+                         
                           keepMounted
                           open={Boolean(anchorEl)}
                           onClose={handleMenuClose}
                         >
-                          <MenuItem onClick={handleEditClick}>Editar</MenuItem>
-                          <MenuItem onClick={handleDeleteClick}>Excluir</MenuItem>
+                          <MenuItem id='menu-edit' onClick={handleEditClick}>Editar</MenuItem>
+                          <MenuItem id='menu-delete' onClick={handleDeleteClick}>Excluir</MenuItem>
                         </Menu>
                       </TableCell>
                     </TableRow>
